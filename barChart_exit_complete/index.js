@@ -16,7 +16,7 @@ var scaleY = d3.scaleLinear().range([400, 0]);
 
 
 //import the data from the .csv file
-d3.csv('./countryData.csv', function(dataIn){
+d3.csv('./countryData_topten.csv', function(dataIn){
 
     nestedData = d3.nest()
         .key(function(d){return d.year})
@@ -24,16 +24,14 @@ d3.csv('./countryData.csv', function(dataIn){
 
     var loadData = nestedData.filter(function(d){return d.key == '1987'})[0].values;
 
-    scaleX.domain(loadData.map(function(d){return d.countryCode;}));
-    scaleY.domain([0, d3.max(loadData.map(function(d){return +d.totalPop}))]);
-
     // Add the x Axis
     svg.append("g")
+        .attr('class','xaxis')
         .attr('transform','translate(0,400)')  //move the x axis from the top of the y axis to the bottom
         .call(d3.axisBottom(scaleX));
 
     svg.append("g")
-        .attr('class','yaxis')
+        .attr('class', 'yaxis')
         .call(d3.axisLeft(scaleY));
 
 /*
@@ -53,12 +51,8 @@ d3.csv('./countryData.csv', function(dataIn){
         */
 
     //bind the data to the d3 selection, but don't draw it yet
-    svg.selectAll('rect')
-        .data(loadData)
-        .enter()
-        .append('rect')
-        .attr('class','bars')
-        .attr('fill', "slategray");
+    //svg.selectAll('rect')
+    //    .data(loadData, function(d){return d;});
 
     //call the drawPoints function below, and hand it the data2016 variable with the 2016 object array in it
     drawPoints(loadData);
@@ -69,13 +63,27 @@ d3.csv('./countryData.csv', function(dataIn){
 //without adding more circles each time.
 function drawPoints(pointData){
 
+    scaleX.domain(pointData.map(function(d){return d.countryCode;}));
     scaleY.domain([0, d3.max(pointData.map(function(d){return +d.totalPop}))]);
 
-    svg.selectAll('.yaxis')
+    d3.selectAll('.xaxis')
+        .call(d3.axisBottom(scaleX));
+
+    d3.selectAll('.yaxis')
         .call(d3.axisLeft(scaleY));
 
-    svg.selectAll('rect')
-        .data(pointData)
+    //select all bars in the DOM, and bind them to the new data
+    var rects = svg.selectAll('.bars')
+        .data(pointData, function(d){return d.countryCode;});
+
+    //look to see if there are any old bars that don't have keys in the new data list, and remove them.
+    rects.exit()
+        .remove();
+
+    //update the properties of the remaining bars (as before)
+    rects
+        .transition()
+        .duration(200)
         .attr('x',function(d){
             return scaleX(d.countryCode);
         })
@@ -88,6 +96,31 @@ function drawPoints(pointData){
         .attr('height',function(d){
             return 400 - scaleY(d.totalPop);  //400 is the beginning domain value of the y axis, set above
         });
+
+    //add the enter() function to make bars for any new countries in the list, and set their properties
+    rects
+        .enter()
+        .append('rect')
+        .attr('class','bars')
+        .attr('fill', "slategray")
+        .attr('x',function(d){
+            return scaleX(d.countryCode);
+        })
+        .attr('y',function(d){
+            return scaleY(d.totalPop);
+        })
+        .attr('width',function(d){
+            return scaleX.bandwidth();
+        })
+        .attr('height',function(d){
+            return 400 - scaleY(d.totalPop);  //400 is the beginning domain value of the y axis, set above
+        });
+
+    //take out bars for any old countries that no longer exist
+    //rects.exit()
+    //    .remove();
+
+
 
 }
 
