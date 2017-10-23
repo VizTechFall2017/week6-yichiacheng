@@ -1,6 +1,7 @@
 var width = d3.select('svg').attr('width');
 var height = d3.select('svg').attr('height');
 
+
 var marginLeft = 100;
 var marginTop = 100;
 

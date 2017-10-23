@@ -16,7 +16,7 @@ var scaleY = d3.scaleLinear().range([400, 0]);
 
 
 //import the data from the .csv file
-d3.csv('./countryData.csv', function(dataIn){
+d3.csv('./bbrent.csv', function(dataIn){
 
     nestedData = d3.nest()
         .key(function(d){return d.year})
@@ -36,21 +36,21 @@ d3.csv('./countryData.csv', function(dataIn){
         .attr('class','yaxis')
         .call(d3.axisLeft(scaleY));
 
-    /*
-        svg.append('text')
-            .text('Weekly income by age and gender')
-            .attr('transform','translate(300, -20)')
-            .style('text-anchor','middle');
+/*
+    svg.append('text')
+        .text('Weekly income by age and gender')
+        .attr('transform','translate(300, -20)')
+        .style('text-anchor','middle');
 
-        svg.append('text')
-            .text('age group')
-            .attr('transform','translate(260, 440)');
+    svg.append('text')
+        .text('age group')
+        .attr('transform','translate(260, 440)');
 
-        svg.append('text')
-            .text('weekly income')
-            .attr('transform', 'translate(-50,250)rotate(270)');
+    svg.append('text')
+        .text('weekly income')
+        .attr('transform', 'translate(-50,250)rotate(270)');
 
-            */
+        */
 
     //bind the data to the d3 selection, but don't draw it yet
     svg.selectAll('rect')
